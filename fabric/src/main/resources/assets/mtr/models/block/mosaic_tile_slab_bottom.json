@@ -1,0 +1,9 @@
+{
+	"parent": "minecraft:block/slab",
+	"textures": {
+		"particle": "mtr:block/mosaic_tile",
+		"bottom": "mtr:block/mosaic_tile",
+		"top": "mtr:block/mosaic_tile",
+		"side": "mtr:block/mosaic_tile"
+	}
+}

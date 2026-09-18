@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"B",
+		"B",
+		"I"
+	],
+	"key": {
+		"B": "minecraft:iron_bars",
+		"I": "#c:iron_ingots"
+	},
+	"result": {
+		"count": 8,
+		"id": "mtr:clock_pole"
+	}
+}

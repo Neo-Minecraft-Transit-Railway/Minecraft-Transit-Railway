@@ -1,0 +1,9 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"ingredients": [
+		"mtr:psd_door"
+	],
+	"result": {
+		"id": "mtr:psd_glass"
+	}
+}

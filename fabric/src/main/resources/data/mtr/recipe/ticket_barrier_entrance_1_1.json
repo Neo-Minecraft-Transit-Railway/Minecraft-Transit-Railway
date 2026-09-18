@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"RG",
+		"BB"
+	],
+	"key": {
+		"R": "#c:redstone_dusts",
+		"G": "#c:glowstone_dusts",
+		"B": "#c:iron_blocks"
+	},
+	"result": {
+		"count": 32,
+		"id": "mtr:ticket_barrier_entrance_1"
+	}
+}

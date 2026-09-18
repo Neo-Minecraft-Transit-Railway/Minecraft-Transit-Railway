@@ -1,0 +1,6 @@
+{
+	"parent": "minecraft:block/air",
+	"textures": {
+		"particle": "mtr:item/station_name_wall_white"
+	}
+}

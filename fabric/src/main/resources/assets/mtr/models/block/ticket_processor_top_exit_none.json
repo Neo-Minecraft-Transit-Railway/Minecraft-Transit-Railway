@@ -1,0 +1,10 @@
+{
+	"parent": "mtr:block/ticket_processor_top_base",
+	"textures": {
+		"particle": "block/lime_concrete",
+		"color": "block/lime_concrete",
+		"red_light": "mtr:block/transparent",
+		"yellow_light": "mtr:block/transparent",
+		"green_light": "mtr:block/transparent"
+	}
+}

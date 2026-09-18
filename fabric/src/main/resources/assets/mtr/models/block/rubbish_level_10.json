@@ -1,0 +1,32 @@
+{
+	"parent": "minecraft:block/block",
+	"textures": {
+		"particle": "mtr:block/rubbish",
+		"main": "mtr:block/rubbish"
+	},
+	"elements": [
+		{
+			"from": [
+				2.5,
+				10,
+				0.5
+			],
+			"to": [
+				13.5,
+				10,
+				4
+			],
+			"faces": {
+				"up": {
+					"uv": [
+						5,
+						4,
+						16,
+						7.5
+					],
+					"texture": "#main"
+				}
+			}
+		}
+	]
+}

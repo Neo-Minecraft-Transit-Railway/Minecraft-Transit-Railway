@@ -1,0 +1,18 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"III",
+		"IGI",
+		"SRS"
+	],
+	"key": {
+		"I": "#c:iron_ingots",
+		"G": "#c:glowstone_dusts",
+		"S": "minecraft:stone",
+		"R": "#c:redstone_dusts"
+	},
+	"result": {
+		"count": 4,
+		"id": "mtr:ticket_machine"
+	}
+}

@@ -1,0 +1,7 @@
+{
+	"parent": "minecraft:block/leaves",
+	"textures": {
+		"particle": "mtr:block/station_color_purpur_block",
+		"all": "mtr:block/station_color_purpur_block"
+	}
+}

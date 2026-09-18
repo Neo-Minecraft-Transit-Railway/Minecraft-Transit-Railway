@@ -1,0 +1,7 @@
+{
+	"parent": "minecraft:block/leaves",
+	"textures": {
+		"particle": "block/smooth_stone",
+		"all": "block/smooth_stone"
+	}
+}

@@ -1,0 +1,7 @@
+{
+	"parent": "minecraft:block/leaves",
+	"textures": {
+		"particle": "block/quartz_block_side",
+		"all": "block/quartz_block_side"
+	}
+}

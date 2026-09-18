@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		" E ",
+		"EBE",
+		" E "
+	],
+	"key": {
+		"E": "minecraft:ender_eye",
+		"B": "mtr:brush"
+	},
+	"result": {
+		"count": 4,
+		"id": "mtrsteamloco:eye_candy"
+	}
+}

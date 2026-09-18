@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		" B ",
+		" D ",
+		"DDD"
+	],
+	"key": {
+		"B": "minecraft:jukebox",
+		"D": "#c:iron_ingots"
+	},
+	"result": {
+		"count": 1,
+		"id": "mtr:tactile_map"
+	}
+}

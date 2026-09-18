@@ -1,0 +1,7 @@
+{
+	"parent": "minecraft:block/cube_all",
+	"textures": {
+		"particle": "mtr:block/rock_1",
+		"all": "mtr:block/rock_1"
+	}
+}

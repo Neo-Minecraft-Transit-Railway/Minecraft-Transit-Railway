@@ -1,0 +1,7 @@
+{
+	"parent": "minecraft:block/leaves",
+	"textures": {
+		"particle": "block/chiseled_stone_bricks",
+		"all": "block/chiseled_stone_bricks"
+	}
+}

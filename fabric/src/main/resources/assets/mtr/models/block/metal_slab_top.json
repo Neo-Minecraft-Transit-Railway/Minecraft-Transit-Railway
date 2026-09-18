@@ -1,0 +1,9 @@
+{
+	"parent": "minecraft:block/slab_top",
+	"textures": {
+		"particle": "mtr:block/metal",
+		"bottom": "mtr:block/metal",
+		"top": "mtr:block/metal",
+		"side": "mtr:block/metal"
+	}
+}

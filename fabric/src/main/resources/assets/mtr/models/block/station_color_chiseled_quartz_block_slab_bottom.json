@@ -1,0 +1,8 @@
+{
+	"parent": "mtr:block/station_color_slab_bottom_pillar_base",
+	"textures": {
+		"particle": "block/chiseled_quartz_block",
+		"end": "block/chiseled_quartz_block_top",
+		"side": "block/chiseled_quartz_block"
+	}
+}

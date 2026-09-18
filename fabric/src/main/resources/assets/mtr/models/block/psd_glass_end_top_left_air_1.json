@@ -1,0 +1,8 @@
+{
+	"parent": "mtr:block/psd_glass_end_left_air_base",
+	"textures": {
+		"particle": "mtr:block/psd_glass_diagonal_top_1",
+		"front": "mtr:block/psd_glass_diagonal_top_1",
+		"back": "mtr:block/psd_glass_diagonal_top_back_1"
+	}
+}

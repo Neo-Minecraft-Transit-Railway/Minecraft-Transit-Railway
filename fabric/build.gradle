@@ -1,0 +1,146 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+import org.mtr.core.Generator
+import org.mtr.mod.BuildTools
+
+plugins {
+	id "fabric-loom" version "1.17.19"
+}
+
+final BuildTools buildTools = new BuildTools(minecraftVersion, "fabric", project)
+
+loom {
+	accessWidenerPath = file("src/main/resources/mtr.accesswidener")
+	runConfigs.configureEach { ideConfigGenerated = true }
+	mixin {
+		useLegacyMixinAp = true
+		defaultRefmapName = "mtr.refmap.json"
+	}
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${minecraftVersion}"
+	// Mojmap at compile time; remapJar stays enabled so the published jar runs on official obfuscated 1.21.11 Fabric.
+	mappings loom.officialMojangMappings()
+	modImplementation "net.fabricmc:fabric-loader:${fabricLoaderVersion}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
+	modApi("com.terraformersmc:modmenu:${modMenuVersion}") { exclude group: "net.fabricmc", module: "fabric-loader" }
+	// -dev (Mojmap) for compile classpath; remapped intermediary jar is what ships/runs on official Fabric.
+	shadowImplementation "org.mtr:Minecraft-Mappings-fabric-${minecraftVersion}:0.0.1-dev"
+	testImplementation "org.junit.jupiter:junit-jupiter-api:5.14.4"
+	testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.14.4"
+	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.14.4"
+
+	if (buildTools.hasJadeSupport()) {
+		modCompileOnly "maven.modrinth:jade:${buildTools.getJadeVersion()}"
+	}
+
+	if (buildTools.hasWthitSupport()) {
+		modCompileOnly "mcp.mobius.waila:wthit-api:${buildTools.getWthitVersion()}"
+	}
+}
+
+repositories {
+	maven { url = "https://maven.terraformersmc.com/" }
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+	withSourcesJar()
+	withJavadocJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = "UTF-8"
+	options.release = 21
+}
+
+tasks.register("setupWebsiteFiles") {
+	doLast {
+		Generator.generateTypeScript(project, "schema/resource", "../website/src/app/entity/generated")
+	}
+}
+
+tasks.register("setupWebserverResources") {
+	doLast {
+		buildTools.generateWebsiteResources()
+	}
+}
+
+tasks.register("setupFiles") {
+	dependsOn("setupWebserverResources")
+	doLast {
+		copy {
+			from "src/main/KeysTemplate.java"
+			into "src/main/java/org/mtr/mod"
+			filter(ReplaceTokens, tokens: ["version": version + "+" + minecraftVersion, "server": testServer, "debug": debug])
+			rename "(.+)Template.java", "\$1.java"
+		}
+
+		copy {
+			from "src/main/fabric.mod.template.json"
+			into "src/main/resources"
+			filter(ReplaceTokens, tokens: ["minecraft": minecraftVersion, "version": version])
+			rename "(.+).template.json", "\$1.json"
+		}
+
+		if (buildTools.hasJadeSupport()) {
+			copy {
+				from "src/main/JadeConfigTemplate.java"
+				into "src/main/java/org/mtr/init"
+				rename "(.+)Template.java", "\$1.java"
+			}
+		} else {
+			delete fileTree("src/main/java/org/mtr/init/JadeConfig.java")
+		}
+
+		if (buildTools.hasWthitSupport()) {
+			copy {
+				from "src/main/WthitConfigTemplate.java"
+				into "src/main/java/org/mtr/init"
+				rename "(.+)Template.java", "\$1.java"
+			}
+
+			copy {
+				from "src/main/wthit_plugins_template.json"
+				into "src/main/resources"
+				rename "(.+)_template.json", "\$1.json"
+			}
+		} else {
+			delete fileTree("src/main/java/org/mtr/init/WthitConfig.java")
+			delete fileTree("src/main/resources/wthit_plugins.json")
+		}
+
+		buildTools.downloadTranslations(crowdinApiKey, geminiApiKey)
+		buildTools.generateTranslations()
+		buildTools.copyLootTables("mtr")
+		buildTools.copyLootTables("mtrsteamloco")
+		buildTools.copyFontDefinition()
+		buildTools.copyVehicleTemplates()
+		buildTools.getPatreonList(patreonApiKey)
+		Generator.generateJava(project, "schema/config", "mod/generated/config", false, "mod.config")
+		Generator.generateJava(project, "schema/resource", "mod/generated/resource", false, "core.data", "mod.resource")
+		Generator.generateJava(project, "schema/legacy", "legacy/generated/resource", false)
+	}
+}
+
+build {
+	doLast {
+		buildTools.copyBuildFile(excludeAssets == "true")
+	}
+}
+
+shadowJar {
+	exclude excludeAssets == "true" ? "assets" : "abc123"
+}
+
+remapJar {
+	dependsOn(shadowJar)
+	mustRunAfter(shadowJar)
+	inputFile = shadowJar.archiveFile
+}
+
+test {
+	useJUnitPlatform()
+	testLogging { showStandardStreams = true }
+}

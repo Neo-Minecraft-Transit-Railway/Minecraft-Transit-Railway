@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"WWW",
+		"WIW",
+		"W W"
+	],
+	"key": {
+		"I": "#c:iron_ingots",
+		"W": "#minecraft:logs"
+	},
+	"result": {
+		"count": 1,
+		"id": "mtr:tunnel_creator_4_3"
+	}
+}

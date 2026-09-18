@@ -1,0 +1,7 @@
+{
+	"parent": "minecraft:block/leaves",
+	"textures": {
+		"particle": "block/white_stained_glass",
+		"all": "block/white_stained_glass"
+	}
+}

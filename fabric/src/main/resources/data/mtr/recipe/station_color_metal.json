@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"BBB",
+		"BDB",
+		"BBB"
+	],
+	"key": {
+		"B": "mtr:metal",
+		"D": "#c:dyes"
+	},
+	"result": {
+		"count": 8,
+		"id": "mtr:station_color_metal"
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"III",
+		" B ",
+		"SSS"
+	],
+	"key": {
+		"I": "#c:iron_ingots",
+		"B": "#c:iron_blocks",
+		"S": "minecraft:string"
+	},
+	"result": {
+		"count": 32,
+		"id": "mtr:cable_car_node_lower"
+	}
+}

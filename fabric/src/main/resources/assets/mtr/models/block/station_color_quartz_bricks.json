@@ -1,0 +1,7 @@
+{
+	"parent": "minecraft:block/leaves",
+	"textures": {
+		"particle": "block/quartz_bricks",
+		"all": "block/quartz_bricks"
+	}
+}

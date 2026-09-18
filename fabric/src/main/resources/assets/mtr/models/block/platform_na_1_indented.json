@@ -1,0 +1,10 @@
+{
+	"parent": "mtr:block/platform_base_indented",
+	"textures": {
+		"particle": "block/stone",
+		"main": "block/stone",
+		"front": "block/stone",
+		"inner": "block/stone_bricks",
+		"top": "mtr:block/platform_na_1"
+	}
+}

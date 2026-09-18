@@ -1,0 +1,18 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"IGI",
+		"BBB",
+		"SSS"
+	],
+	"key": {
+		"I": "#c:iron_ingots",
+		"G": "#c:glowstone_dusts",
+		"B": "#c:iron_blocks",
+		"S": "#minecraft:signs"
+	},
+	"result": {
+		"count": 32,
+		"id": "mtr:railway_sign_2_even"
+	}
+}

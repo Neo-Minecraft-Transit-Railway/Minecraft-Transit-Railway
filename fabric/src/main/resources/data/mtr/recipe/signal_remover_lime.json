@@ -1,0 +1,11 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"ingredients": [
+		"#minecraft:rails",
+		"#c:lime_dyes",
+		"minecraft:lava_bucket"
+	],
+	"result": {
+		"id": "mtr:signal_remover_lime"
+	}
+}

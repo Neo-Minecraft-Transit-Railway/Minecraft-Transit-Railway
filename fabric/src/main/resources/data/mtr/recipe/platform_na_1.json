@@ -1,0 +1,18 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"ingredients": [
+		"minecraft:stone_bricks",
+		"minecraft:stone_bricks",
+		"minecraft:stone_bricks",
+		"minecraft:stone_bricks",
+		"minecraft:stone_bricks",
+		"minecraft:stone_bricks",
+		"#c:yellow_dyes",
+		"#c:yellow_dyes",
+		"#c:yellow_dyes"
+	],
+	"result": {
+		"count": 6,
+		"id": "mtr:platform_na_1"
+	}
+}

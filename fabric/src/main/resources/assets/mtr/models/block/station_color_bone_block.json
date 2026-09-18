@@ -1,0 +1,8 @@
+{
+	"parent": "mtr:block/leaves_column",
+	"textures": {
+		"particle": "block/bone_block_side",
+		"end": "block/bone_block_top",
+		"side": "block/bone_block_side"
+	}
+}
