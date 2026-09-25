@@ -1,0 +1,4 @@
+accessWidener	v2	named
+accessible	method	net/minecraft/client/gui/components/Checkbox	<init>	(IIILnet/minecraft/network/chat/Component;Lnet/minecraft/client/gui/Font;ZLnet/minecraft/client/gui/components/Checkbox$OnValueChange;)V
+accessible	field	net/minecraft/client/gui/components/Checkbox	textWidget	Lnet/minecraft/client/gui/components/MultiLineTextWidget;
+accessible	method	net/minecraft/client/renderer/GameRenderer	getFov	(Lnet/minecraft/client/Camera;FZ)F
