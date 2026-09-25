@@ -1,5 +1,6 @@
 package org.mtr.mod.data;
 
+import org.mtr.core.data.Position;
 import org.mtr.core.data.Station;
 import org.mtr.core.operation.NearbyAreasRequest;
 import org.mtr.core.operation.NearbyAreasResponse;
@@ -30,13 +31,38 @@ public class TicketSystem {
 	private static final int ZONE_FARE = 1;
 	private static final int EVASION_FINE = 500;
 
+	// Barriers are often placed just outside the drawn station AABB; a small radius still
+	// associates the gate with the nearest station instead of permanently refusing.
+	private static final long BARRIER_STATION_SEARCH_RADIUS = 16;
+
 	public static void passThrough(World world, BlockPos blockPos, PlayerEntity player, boolean isEntrance, boolean isExit, SoundEvent entrySound, SoundEvent entrySoundConcessionary, SoundEvent exitSound, SoundEvent exitSoundConcessionary, @Nullable SoundEvent failSound, boolean remindIfNoRecord, Consumer<EnumTicketBarrierOpen> callback) {
-		Init.sendMessageC2S(OperationProcessor.NEARBY_STATIONS, world.getServer(), world, new NearbyAreasRequest<>(Init.blockPosToPosition(blockPos), 0), nearbyAreasResponse -> {
+		Init.sendMessageC2S(OperationProcessor.NEARBY_STATIONS, world.getServer(), world, new NearbyAreasRequest<>(Init.blockPosToPosition(blockPos), BARRIER_STATION_SEARCH_RADIUS), nearbyAreasResponse -> {
 			final ObjectImmutableList<Station> stations = nearbyAreasResponse.getStations();
 			if (stations.isEmpty()) {
 				callback.accept(EnumTicketBarrierOpen.CLOSED);
 			} else {
-				final Station station = stations.get(0);
+				// Prefer the station whose area actually contains the barrier; else nearest by center.
+				final Position barrierPos = Init.blockPosToPosition(blockPos);
+				Station station = null;
+				for (final Station candidate : stations) {
+					if (candidate.inArea(barrierPos)) {
+						station = candidate;
+						break;
+					}
+				}
+				if (station == null) {
+					station = stations.get(0);
+					double best = Double.MAX_VALUE;
+					for (final Station candidate : stations) {
+						final double dx = (candidate.getMinX() + candidate.getMaxX()) / 2.0 - barrierPos.getX();
+						final double dz = (candidate.getMinZ() + candidate.getMaxZ()) / 2.0 - barrierPos.getZ();
+						final double dist = dx * dx + dz * dz;
+						if (dist < best) {
+							best = dist;
+							station = candidate;
+						}
+					}
+				}
 				final boolean isEntering;
 
 				if (isEntrance && isExit) {

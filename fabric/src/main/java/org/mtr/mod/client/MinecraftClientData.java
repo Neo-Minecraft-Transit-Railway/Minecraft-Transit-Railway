@@ -215,7 +215,8 @@ public final class MinecraftClientData extends ClientData {
 
 	public static class LiftWrapper {
 
-		public boolean shouldRender;
+		// Default true so content is visible before the first occlusion-worker tick.
+		public boolean shouldRender = true;
 		private Lift lift;
 
 		private LiftWrapper(Lift lift) {
@@ -229,7 +230,9 @@ public final class MinecraftClientData extends ClientData {
 
 	public static class RailWrapper {
 
-		public boolean shouldRender;
+		// Default true so rails are visible before the first occlusion-worker tick
+		// (Iris false-positive shadow detection used to prevent the worker from starting).
+		public boolean shouldRender = true;
 		public final String hexId;
 		public final Vec3d startVector;
 		public final Vec3d endVector;

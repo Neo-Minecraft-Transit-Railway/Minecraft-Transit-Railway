@@ -111,8 +111,8 @@ public final class InitClient {
 		REGISTRY_CLIENT.registerBlockRenderType(RenderLayer.getCutout(), Blocks.STATION_NAME_TALL_BLOCK_DOUBLE_SIDED);
 		REGISTRY_CLIENT.registerBlockRenderType(RenderLayer.getCutout(), Blocks.STATION_NAME_TALL_WALL);
 		REGISTRY_CLIENT.registerBlockRenderType(RenderLayer.getCutout(), Blocks.STATION_NAME_TALL_STANDING);
-		REGISTRY_CLIENT.registerBlockRenderType(RenderLayer.getCutout(), Blocks.TICKET_BARRIER_ENTRANCE_1);
-		REGISTRY_CLIENT.registerBlockRenderType(RenderLayer.getCutout(), Blocks.TICKET_BARRIER_EXIT_1);
+		REGISTRY_CLIENT.registerBlockRenderType(RenderLayer.getTranslucent(), Blocks.TICKET_BARRIER_ENTRANCE_1);
+		REGISTRY_CLIENT.registerBlockRenderType(RenderLayer.getTranslucent(), Blocks.TICKET_BARRIER_EXIT_1);
 		REGISTRY_CLIENT.registerBlockRenderType(RenderLayer.getCutout(), Blocks.TICKET_MACHINE);
 		REGISTRY_CLIENT.registerBlockRenderType(RenderLayer.getCutout(), Blocks.TICKET_PROCESSOR);
 		REGISTRY_CLIENT.registerBlockRenderType(RenderLayer.getCutout(), Blocks.TICKET_PROCESSOR_ENTRANCE);
@@ -190,7 +190,11 @@ public final class InitClient {
 		REGISTRY_CLIENT.registerBlockEntityRenderer(BlockEntityTypes.STATION_NAME_WALL_BLACK, dispatcher -> new RenderStationNameTiled<>(dispatcher, false));
 		REGISTRY_CLIENT.registerBlockEntityRenderer(BlockEntityTypes.EYE_CANDY, RenderEyeCandy::new);
 
+		// Keep entity renderer registered for registry completeness, but drawing is
+		// WorldRenderEvents-only (MTR 4.1 / 1.21+). Do NOT set worldRenderingEntity —
+		// the dummy entity's eye-height offset is not Camera.position() and floats rails.
 		REGISTRY_CLIENT.registerEntityRenderer(EntityTypes.RENDERING, MainRenderer::new);
+		REGISTRY_CLIENT.eventRegistryClient.registerWorldRenderAfterEntities(MainRenderer::render);
 
 		REGISTRY_CLIENT.registerItemModelPredicate(Items.RAIL_CONNECTOR_20, new Identifier(Init.MOD_ID, "selected"), checkItemPredicateTag());
 		REGISTRY_CLIENT.registerItemModelPredicate(Items.RAIL_CONNECTOR_20_ONE_WAY, new Identifier(Init.MOD_ID, "selected"), checkItemPredicateTag());
@@ -410,21 +414,19 @@ public final class InitClient {
 
 			final ClientWorld clientWorld = MinecraftClient.getInstance().getWorldMapped();
 			if (clientWorld != null) {
-				final boolean[] shouldCreateEntity = {true};
+				// Remove legacy dummy render entities if any remain from older jars.
 				MinecraftClientHelper.getEntities(entity -> {
-					if (entity.data instanceof EntityRendering) {
-						shouldCreateEntity[0] = false;
-						((EntityRendering) entity.data).update();
+					if (entity.data instanceof EntityRendering entityRendering) {
+						entityRendering.kill2();
 					}
 				});
-				if (shouldCreateEntity[0]) {
-					MinecraftClientHelper.addEntity(new EntityRendering(new World(clientWorld.data)));
-				}
 
-				// If world or dimension changed, reset the data
+				// If world or dimension changed, reset the data and request a sync immediately
+				// (don't wait for chunk-load events — Voxy/Iris can skip or delay those).
 				if (lastClientWorld == null || !lastClientWorld.equals(clientWorld)) {
 					lastClientWorld = clientWorld;
 					MinecraftClientData.reset();
+					lastUpdatePacketMillis = getGameMillis() + 100;
 				}
 			}
 

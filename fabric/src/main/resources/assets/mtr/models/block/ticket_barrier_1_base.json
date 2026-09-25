@@ -3,11 +3,38 @@
 	"textures": {
 		"particle": "mtr:block/metal",
 		"black": "mtr:block/black",
-		"yellow": "block/yellow_concrete",
+		"yellow": "minecraft:block/yellow_concrete",
 		"ticket": "mtr:block/ticket_processor",
-		"arrow": "mtr:block/sign/arrow_down_left"
+		"arrow": "mtr:block/sign/arrow_down_left",
+		"flap": "mtr:block/ticket_barrier_glass"
 	},
 	"elements": [
+		{
+			"from": [ 6, 3.5, 7.2 ],
+			"to": [ 12, 13.5, 8.8 ],
+			"shade": false,
+			"faces": {
+				"up": { "texture": "#flap" },
+				"down": { "texture": "#flap" },
+				"north": { "texture": "#flap" },
+				"south": { "texture": "#flap" },
+				"west": { "texture": "#flap" },
+				"east": { "texture": "#flap" }
+			}
+		},
+		{
+			"from": [ 0, 3.5, 7.2 ],
+			"to": [ 6, 13.5, 8.8 ],
+			"shade": false,
+			"faces": {
+				"up": { "texture": "#flap" },
+				"down": { "texture": "#flap" },
+				"north": { "texture": "#flap" },
+				"south": { "texture": "#flap" },
+				"west": { "texture": "#flap" },
+				"east": { "texture": "#flap" }
+			}
+		},
 		{
 			"from": [ 12, 1, 0 ],
 			"to": [ 16, 15, 16 ],

@@ -1,10 +1,11 @@
 {
 	"parent": "mtr:block/ticket_barrier_1_base",
 	"textures": {
-		"particle": "block/orange_concrete",
-		"color": "block/orange_concrete",
+		"particle": "minecraft:block/orange_concrete",
+		"color": "minecraft:block/orange_concrete",
 		"yellow_glass_off": "mtr:block/transparent",
-		"yellow_glass_on": "block/yellow_concrete",
-		"sign": "mtr:block/sign/arrow_up"
+		"yellow_glass_on": "minecraft:block/yellow_concrete",
+		"sign": "mtr:block/sign/arrow_up",
+		"flap": "mtr:block/transparent"
 	}
 }

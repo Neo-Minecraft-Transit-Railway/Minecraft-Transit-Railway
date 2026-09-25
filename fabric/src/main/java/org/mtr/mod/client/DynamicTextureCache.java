@@ -244,24 +244,28 @@ public class DynamicTextureCache implements IGui {
 		}
 
 		MainRenderer.WORKER_THREAD.scheduleDynamicTextures(() -> {
-			while (font == null) {
+			if (font == null) {
+				final Font[] loaded = {null};
 				ResourceManagerHelper.readResource(new Identifier(Init.MOD_ID, "font/noto-sans-semibold.ttf"), inputStream -> {
 					try {
-						font = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+						loaded[0] = Font.createFont(Font.TRUETYPE_FONT, inputStream);
 					} catch (Exception e) {
-						Init.LOGGER.error("", e);
+						Init.LOGGER.error("Failed to load MTR font", e);
 					}
 				});
+				font = loaded[0] != null ? loaded[0] : new Font(Font.SANS_SERIF, Font.BOLD, 12);
 			}
 
-			while (fontCjk == null) {
+			if (fontCjk == null) {
+				final Font[] loaded = {null};
 				ResourceManagerHelper.readResource(new Identifier(Init.MOD_ID, "font/noto-serif-cjk-tc-semibold.ttf"), inputStream -> {
 					try {
-						fontCjk = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+						loaded[0] = Font.createFont(Font.TRUETYPE_FONT, inputStream);
 					} catch (Exception e) {
-						Init.LOGGER.error("", e);
+						Init.LOGGER.error("Failed to load MTR CJK font", e);
 					}
 				});
+				fontCjk = loaded[0] != null ? loaded[0] : font;
 			}
 
 			final NativeImage nativeImage = supplier.get();

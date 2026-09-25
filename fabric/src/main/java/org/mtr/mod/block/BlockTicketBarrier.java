@@ -18,7 +18,7 @@ public class BlockTicketBarrier extends BlockExtension implements DirectionHelpe
 	public static final EnumProperty<TicketSystem.EnumTicketBarrierOpen> OPEN = EnumProperty.of("open", TicketSystem.EnumTicketBarrierOpen.class);
 
 	public BlockTicketBarrier(boolean isEntrance) {
-		super(Blocks.createDefaultBlockSettings(true, blockState -> 5));
+		super(Blocks.createDefaultBlockSettings(true, blockState -> 5).nonOpaque());
 		this.isEntrance = isEntrance;
 	}
 
@@ -65,6 +65,7 @@ public class BlockTicketBarrier extends BlockExtension implements DirectionHelpe
 	@Nonnull
 	@Override
 	public VoxelShape getOutlineShape2(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+		// Stock pillar outline (not full block) — full outline caused Sodium black board.
 		final Direction facing = IBlock.getStatePropertySafe(state, FACING);
 		return IBlock.getVoxelShapeByDirection(12, 0, 0, 16, 15, 16, facing);
 	}
@@ -76,6 +77,23 @@ public class BlockTicketBarrier extends BlockExtension implements DirectionHelpe
 		final TicketSystem.EnumTicketBarrierOpen open = IBlock.getStatePropertySafe(state, new Property<>(OPEN.data));
 		final VoxelShape base = IBlock.getVoxelShapeByDirection(15, 0, 0, 16, 24, 16, facing);
 		return open == TicketSystem.EnumTicketBarrierOpen.OPEN || open == TicketSystem.EnumTicketBarrierOpen.OPEN_CONCESSIONARY ? base : VoxelShapes.union(IBlock.getVoxelShapeByDirection(0, 0, 7, 16, 24, 9, facing), base);
+	}
+
+	@Nonnull
+	@Override
+	public VoxelShape getCullingShape2(BlockState state, BlockView world, BlockPos pos) {
+		// Empty cull so translucent flaps outside the pillar outline are not culled (Sodium).
+		return VoxelShapes.empty();
+	}
+
+	@Override
+	public float getAmbientOcclusionLightLevel2(BlockState state, BlockView world, BlockPos pos) {
+		return 1;
+	}
+
+	@Override
+	public boolean isTranslucent2(BlockState state, BlockView world, BlockPos pos) {
+		return true;
 	}
 
 	@Override

@@ -25,6 +25,15 @@ import java.awt.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+/**
+ * World overlay renderer (rails, vehicles, lifts, scheduled BER quads).
+ * <p>
+ * On 1.21+, MTR 4.1 style: draw only from {@code WorldRenderEvents.AFTER_ENTITIES}
+ * with offset = this frame's {@link Camera} world position. The dummy
+ * {@link EntityRendering} path is intentionally a no-op — its PoseStack is
+ * entity-relative and {@code getEyePosition} is not the camera, which caused
+ * rails to float/flicker when walking or flying.
+ */
 public class MainRenderer extends EntityRenderer<EntityRendering> implements IGui {
 
 	private static long timerMillis;
@@ -59,12 +68,13 @@ public class MainRenderer extends EntityRenderer<EntityRendering> implements IGu
 
 	@Override
 	public void render(EntityRendering entityRendering, float yaw, float tickDelta, GraphicsHolder graphicsHolder, int i) {
-		render(graphicsHolder, entityRendering.getCameraPosVec2(tickDelta));
+		// 4.1-style: never draw from EntityRenderer. Pose here is entity-relative and
+		// getCameraPosVec2 (== getEyePosition) is not Camera.position() on 1.21.11.
 	}
 
 	@Override
 	public boolean shouldRender2(EntityRendering entity, Frustum frustum, double x, double y, double z) {
-		return true;
+		return false;
 	}
 
 	@Nonnull
@@ -73,6 +83,11 @@ public class MainRenderer extends EntityRenderer<EntityRendering> implements IGu
 		return new Identifier("");
 	}
 
+	/**
+	 * @param offset this frame's camera world position ({@code Camera.position()}).
+	 *               Vertices must be {@code worldPos - offset} because AFTER_ENTITIES
+	 *               PoseStack origin is the camera.
+	 */
 	public static void render(GraphicsHolder graphicsHolder, Vector3d offset) {
 		final MinecraftClient minecraftClient = MinecraftClient.getInstance();
 		final ClientWorld clientWorld = minecraftClient.getWorldMapped();
@@ -82,37 +97,38 @@ public class MainRenderer extends EntityRenderer<EntityRendering> implements IGu
 			return;
 		}
 
-		final long millisElapsed;
+		// Never draw into Iris/shader shadow cameras (wrong offset → floating ghosts).
 		if (OptimizedRenderer.renderingShadows()) {
-			if (Config.getClient().getDisableShadowsForShaders()) {
-				return;
-			}
-			millisElapsed = 0;
-		} else {
-			millisElapsed = getMillisElapsed();
-			timerMillis += millisElapsed;
-
-			MinecraftClientData.getInstance().blockedRailIds.clear();
-			MinecraftClientData.getInstance().vehicles.forEach(vehicle -> vehicle.simulate(millisElapsed));
-			MinecraftClientData.getInstance().lifts.forEach(lift -> {
-				lift.tick(millisElapsed);
-				if (VehicleRidingMovement.isRiding(lift.getId()) && VehicleRidingMovement.showShiftProgressBar()) {
-					clientPlayerEntity.sendMessage(TranslationProvider.GUI_MTR_PRESS_TO_SELECT_FLOOR.getText(KeyBindings.LIFT_MENU.getBoundKeyLocalizedText().getString()), true);
-				}
-			});
-			lastRenderedMillis = InitClient.getGameMillis();
-			WORKER_THREAD.start();
-			DynamicTextureCache.instance.tick();
-			// Tick the riding cool down (dismount player if they are no longer riding a vehicle) and store the player offset cache
-			VehicleRidingMovement.tick();
-			ArrivalsCacheClient.INSTANCE.tick();
+			return;
 		}
 
+		final long millisElapsed = getMillisElapsed();
+		timerMillis += millisElapsed;
+
+		MinecraftClientData.getInstance().blockedRailIds.clear();
+		MinecraftClientData.getInstance().vehicles.forEach(vehicle -> vehicle.simulate(millisElapsed));
+		MinecraftClientData.getInstance().lifts.forEach(lift -> {
+			lift.tick(millisElapsed);
+			if (VehicleRidingMovement.isRiding(lift.getId()) && VehicleRidingMovement.showShiftProgressBar()) {
+				clientPlayerEntity.sendMessage(TranslationProvider.GUI_MTR_PRESS_TO_SELECT_FLOOR.getText(KeyBindings.LIFT_MENU.getBoundKeyLocalizedText().getString()), true);
+			}
+		});
+		lastRenderedMillis = InitClient.getGameMillis();
+		WORKER_THREAD.start();
+		DynamicTextureCache.instance.tick();
+		VehicleRidingMovement.tick();
+		ArrivalsCacheClient.INSTANCE.tick();
+
+		// Riding camera shake only — still relative to real camera, not feet position alone.
 		final Vector3d cameraShakeOffset = clientPlayerEntity.getPos().subtract(offset);
 		RenderVehicles.render(millisElapsed, cameraShakeOffset);
 		RenderLifts.render(millisElapsed, cameraShakeOffset);
 		RenderRails.render();
+		flushQueuedRenders(graphicsHolder, offset);
+		CustomResourceLoader.OPTIMIZED_RENDERER_WRAPPER.render(!Config.getClient().getHideTranslucentParts());
+	}
 
+	private static void flushQueuedRenders(GraphicsHolder graphicsHolder, Vector3d offset) {
 		for (int i = 0; i < TOTAL_RENDER_STAGES; i++) {
 			for (int j = 0; j < QueuedRenderLayer.values().length; j++) {
 				CURRENT_RENDERS.get(i).get(j).clear();
@@ -162,8 +178,6 @@ public class MainRenderer extends EntityRenderer<EntityRendering> implements IGu
 				});
 			}
 		}
-
-		CustomResourceLoader.OPTIMIZED_RENDERER_WRAPPER.render(!Config.getClient().getHideTranslucentParts());
 	}
 
 	public static void scheduleRender(@Nullable Identifier identifier, boolean priority, QueuedRenderLayer queuedRenderLayer, BiConsumer<GraphicsHolder, Vector3d> callback) {
@@ -181,11 +195,6 @@ public class MainRenderer extends EntityRenderer<EntityRendering> implements IGu
 		CURRENT_RENDERS.forEach(renderForPriority -> renderForPriority.forEach(renderForPriorityAndQueuedRenderLayer -> renderForPriorityAndQueuedRenderLayer.remove(identifier)));
 	}
 
-	/**
-	 * Get a continuously ticking timer for rendering, suitable for animations.
-	 *
-	 * @return a value in milliseconds representing the time elapsed, incremented when {@link MainRenderer#render(GraphicsHolder, Vector3d)} gets invoked
-	 */
 	public static long getTimerMillis() {
 		return timerMillis;
 	}

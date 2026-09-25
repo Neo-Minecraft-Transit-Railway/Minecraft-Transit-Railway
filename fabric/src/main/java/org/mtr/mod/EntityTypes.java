@@ -7,7 +7,8 @@ import org.mtr.mod.entity.EntityRendering;
 public final class EntityTypes {
 
 	static {
-		RENDERING = Init.REGISTRY.registerEntityType(new Identifier(Init.MOD_ID, "rendering"), EntityRendering::new, Float.MIN_VALUE, Float.MIN_VALUE);
+		// Non-zero dimensions so the entity stays in the client world / renderer path on 1.21+.
+		RENDERING = Init.REGISTRY.registerEntityType(new Identifier(Init.MOD_ID, "rendering"), EntityRendering::new, 1F, 1F);
 	}
 
 	public static final EntityTypeRegistryObject<EntityRendering> RENDERING;

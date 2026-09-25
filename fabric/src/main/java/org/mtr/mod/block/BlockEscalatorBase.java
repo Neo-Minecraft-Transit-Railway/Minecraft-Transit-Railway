@@ -27,24 +27,6 @@ public abstract class BlockEscalatorBase extends BlockExtension implements IBloc
 
 	@Nonnull
 	@Override
-	public VoxelShape getCullingShape2(BlockState state, BlockView world, BlockPos pos) {
-		// Outline is a full cube, but the baked model is open underneath.
-		// Empty occlusion prevents face/light culling from treating the block as solid.
-		return VoxelShapes.empty();
-	}
-
-	@Override
-	public float getAmbientOcclusionLightLevel2(BlockState state, BlockView world, BlockPos pos) {
-		return 1;
-	}
-
-	@Override
-	public boolean isTranslucent2(BlockState state, BlockView world, BlockPos pos) {
-		return true;
-	}
-
-	@Nonnull
-	@Override
 	public VoxelShape getOutlineShape2(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
 		return super.getOutlineShape2(state, world, pos, context);
 	}
@@ -74,6 +56,11 @@ public abstract class BlockEscalatorBase extends BlockExtension implements IBloc
 	}
 
 	protected final EnumEscalatorOrientation getOrientation(BlockView world, BlockPos pos, BlockState state) {
+		return computeOrientation(world, pos, state);
+	}
+
+	/** Public for placement refresh so clients get the correct model variant immediately. */
+	public static EnumEscalatorOrientation computeOrientation(BlockView world, BlockPos pos, BlockState state) {
 		final Direction facing = IBlock.getStatePropertySafe(state, FACING);
 
 		final BlockPos posAhead = pos.offset(facing);
