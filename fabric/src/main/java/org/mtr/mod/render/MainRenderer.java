@@ -124,7 +124,20 @@ public class MainRenderer extends EntityRenderer<EntityRendering> implements IGu
 		RenderVehicles.render(millisElapsed, cameraShakeOffset);
 		RenderLifts.render(millisElapsed, cameraShakeOffset);
 		RenderRails.render();
+		RenderLiftLinks.render();
+		RenderDiagnostics.noteVehiclesAndLifts(MinecraftClientData.getInstance().vehicles.size(), MinecraftClientData.getInstance().lifts.size());
 		flushQueuedRenders(graphicsHolder, offset);
+		RenderDiagnostics.logFrame(offset, cameraShakeOffset);
+	}
+
+	/**
+	 * Flush optimized (shader) rail/vehicle draws after the translucent world pass starts,
+	 * using captured view/projection matrices from LevelRenderer.
+	 */
+	public static void flushOptimizedRenderer() {
+		if (OptimizedRenderer.renderingShadows()) {
+			return;
+		}
 		CustomResourceLoader.OPTIMIZED_RENDERER_WRAPPER.render(!Config.getClient().getHideTranslucentParts());
 	}
 

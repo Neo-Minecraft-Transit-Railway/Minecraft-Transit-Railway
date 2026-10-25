@@ -195,6 +195,7 @@ public final class InitClient {
 		// the dummy entity's eye-height offset is not Camera.position() and floats rails.
 		REGISTRY_CLIENT.registerEntityRenderer(EntityTypes.RENDERING, MainRenderer::new);
 		REGISTRY_CLIENT.eventRegistryClient.registerWorldRenderAfterEntities(MainRenderer::render);
+		REGISTRY_CLIENT.eventRegistryClient.registerWorldRenderBeforeTranslucent(MainRenderer::flushOptimizedRenderer);
 
 		REGISTRY_CLIENT.registerItemModelPredicate(Items.RAIL_CONNECTOR_20, new Identifier(Init.MOD_ID, "selected"), checkItemPredicateTag());
 		REGISTRY_CLIENT.registerItemModelPredicate(Items.RAIL_CONNECTOR_20_ONE_WAY, new Identifier(Init.MOD_ID, "selected"), checkItemPredicateTag());
@@ -444,6 +445,9 @@ public final class InitClient {
 		});
 
 		REGISTRY_CLIENT.eventRegistryClient.registerEndClientTick(() -> {
+			if (KeyBindings.RENDER_DIAGNOSTICS.consumeClick()) {
+				RenderDiagnostics.toggle();
+			}
 			if (movePlayer != null) {
 				movePlayer.run();
 				movePlayer = null;

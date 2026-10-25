@@ -19,6 +19,7 @@ public final class KeyBindings {
 		DEBUG_3_POSITIVE = InitClient.REGISTRY_CLIENT.registerKeyBinding(TranslationProvider.KEY_MTR_DEBUG_3_POSITIVE.key, GLFW.GLFW_KEY_KP_9, TranslationProvider.CATEGORY_MTR_KEYBINDING.key);
 		DEBUG_ROTATE_CATEGORY_NEGATIVE = InitClient.REGISTRY_CLIENT.registerKeyBinding(TranslationProvider.KEY_MTR_DEBUG_CYCLE_NEGATIVE.key, GLFW.GLFW_KEY_KP_SUBTRACT, TranslationProvider.CATEGORY_MTR_KEYBINDING.key);
 		DEBUG_ROTATE_CATEGORY_POSITIVE = InitClient.REGISTRY_CLIENT.registerKeyBinding(TranslationProvider.KEY_MTR_DEBUG_CYCLE_POSITIVE.key, GLFW.GLFW_KEY_KP_ADD, TranslationProvider.CATEGORY_MTR_KEYBINDING.key);
+		RENDER_DIAGNOSTICS = InitClient.REGISTRY_CLIENT.registerKeyBinding("key.mtr.render_diagnostics", GLFW.GLFW_KEY_F8, TranslationProvider.CATEGORY_MTR_KEYBINDING.key);
 	}
 
 	public static final KeyBinding LIFT_MENU;
@@ -33,6 +34,7 @@ public final class KeyBindings {
 	public static final KeyBinding DEBUG_3_POSITIVE;
 	public static final KeyBinding DEBUG_ROTATE_CATEGORY_NEGATIVE;
 	public static final KeyBinding DEBUG_ROTATE_CATEGORY_POSITIVE;
+	public static final KeyBinding RENDER_DIAGNOSTICS;
 
 	public static void init() {
 		Init.LOGGER.info("Registering Minecraft Transit Railway key bindings");

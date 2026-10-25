@@ -56,4 +56,16 @@ public class StoredMatrixTransformations {
 		storedMatrixTransformations.transformations.addAll(transformations);
 		return storedMatrixTransformations;
 	}
+
+	public double getOriginX() {
+		return initialTranslateX;
+	}
+
+	public double getOriginY() {
+		return initialTranslateY;
+	}
+
+	public double getOriginZ() {
+		return initialTranslateZ;
+	}
 }

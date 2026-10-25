@@ -90,16 +90,24 @@ public class BuildTools {
 				: mappingSources.resolve("resources/minecraft-mappings.accesswidener");
 		Files.copy(awSource, accessWidenerDestination, StandardCopyOption.REPLACE_EXISTING);
 
-		final String[] mixinNames = {"ClientWorldRenderingMixin", "PlayerTeleportationStateAccessor", "PlayerRendererOffsetMixin"};
+		final String[] mixinNames = {"ClientWorldRenderingMixin", "PlayerTeleportationStateAccessor", "PlayerRendererOffsetMixin", "PerspectiveProjectionMatrixBufferMixin", "LevelRendererRenderMatricesMixin"};
 		for (final String mixinName : mixinNames) {
 			Path source = mixinsDir.resolve(mixinName);
 			if (!Files.exists(source)) {
 				source = mappingSources.resolve("java/org/mtr/mapping/mixin/" + mixinName + ".java");
 			}
+			final Path destination = mixinPath.resolve(mixinName + ".java");
+			if (!Files.exists(source)) {
+				// Keep vendored fabric mixins (patch2 projection/matrix capture) when sibling Minecraft-Mappings is absent.
+				if (Files.exists(destination)) {
+					continue;
+				}
+				throw new IOException("Missing mixin source for " + mixinName + " (expected under Minecraft-Mappings or " + destination + ")");
+			}
 			String content = FileUtils.readFileToString(source.toFile(), StandardCharsets.UTF_8);
 			content = content.replace("package org.mtr.mapping.mixin;", "package org.mtr.mixin;");
 			content = content.replace("package @package@;", "package org.mtr.mixin;");
-			FileUtils.write(mixinPath.resolve(mixinName + ".java").toFile(), content, StandardCharsets.UTF_8);
+			FileUtils.write(destination.toFile(), content, StandardCharsets.UTF_8);
 		}
 	}
 

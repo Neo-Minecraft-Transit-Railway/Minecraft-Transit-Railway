@@ -9,7 +9,9 @@
 	],
 	"client": [
 		"ClientWorldRenderingMixin",
-		"PlayerRendererOffsetMixin"
+		"PlayerRendererOffsetMixin",
+		"PerspectiveProjectionMatrixBufferMixin",
+		"LevelRendererRenderMatricesMixin"
 	],
 	"server": [],
 	"injectors": {

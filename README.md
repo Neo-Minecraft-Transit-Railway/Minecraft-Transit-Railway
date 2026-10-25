@@ -21,6 +21,21 @@ This workspace targets the Fabric port for Minecraft 1.21.11. The vehicle simula
 
 Please report any issues or bugs you find; that would be greatly appreciated! Refer to the [todo list](https://github.com/jonafanho/Minecraft-Transit-Railway/projects/2) to see currently known issues.
 
+## Unofficial 1.21.11 Fabric builds (Neo-Minecraft-Transit-Railway)
+
+This fork publishes Fabric jars for **Minecraft 1.21.11 + MTR 4.0.5**. See GitHub Releases.
+
+### patch2 (`v4.0.5-1.21.11-patch2`)
+
+- **Rails vanishing / flickering**: disable incorrect occlusion + camera-frustum culling that hid rails; capture live view/projection matrices for optimized rail shaders (beyond the patch1 FOV fix).
+- **Lift link lines**: draw button/panel ↔ track links as segmented world-space lines while holding a linker (including Yunzhu-compatible linker class names).
+- **Item models**: selected-state connectors/removers use `mtr:legacy_predicate` `range_dispatch` for 1.21.11 item model loading.
+- **Diagnostics**: optional F8 toggle (`key.mtr.render_diagnostics`) for render diagnostics logging.
+
+### patch1 (`v4.0.5-1.21.11-patch1`)
+
+- Dynamic FOV projection for rails/doors/signs/elevators; ticket barrier glass flaps; escalator chain refresh.
+
 ## Downloads and Installation
 
 Head over to the [Modrinth page](https://modrinth.com/mod/minecraft-transit-railway) to download the mod or to see the project information.

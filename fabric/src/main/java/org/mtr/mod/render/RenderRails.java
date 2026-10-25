@@ -1,7 +1,5 @@
 package org.mtr.mod.render;
 
-import com.logisticscraft.occlusionculling.OcclusionCullingInstance;
-import com.logisticscraft.occlusionculling.util.Vec3d;
 import org.mtr.core.data.Rail;
 import org.mtr.core.data.TransportMode;
 import org.mtr.core.tool.Angle;
@@ -39,7 +37,6 @@ import org.mtr.mod.resource.RailResource;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.function.BooleanSupplier;
-import java.util.function.Function;
 
 public class RenderRails implements IGui {
 
@@ -62,21 +59,14 @@ public class RenderRails implements IGui {
 			return;
 		}
 
-		final ObjectArrayList<Function<OcclusionCullingInstance, Runnable>> cullingTasks = new ObjectArrayList<>();
-		final Vector3d cameraPosition = minecraftClient.getGameRendererMapped().getCamera().getPos();
-		final Vec3d camera = new Vec3d(cameraPosition.getXMapped(), cameraPosition.getYMapped(), cameraPosition.getZMapped());
 		final boolean holdingRailRelated = isHoldingRailRelated(clientPlayerEntity);
 
-		// Finding visible rails
+		// Finding rails to render. Occlusion/AABB culling was incorrectly hiding rails
+		// (especially with dynamic FOV / captured matrices); always queue known rails.
 		final ObjectArrayList<Rail> railsToRender = new ObjectArrayList<>();
 		MinecraftClientData.getInstance().railWrapperList.values().forEach(railWrapper -> {
-			cullingTasks.add(occlusionCullingInstance -> {
-				final boolean shouldRender = occlusionCullingInstance.isAABBVisible(railWrapper.startVector, railWrapper.endVector, camera);
-				return () -> railWrapper.shouldRender = shouldRender;
-			});
-			if (railWrapper.shouldRender) {
-				railsToRender.add(railWrapper.getRail());
-			}
+			railWrapper.shouldRender = true;
+			railsToRender.add(railWrapper.getRail());
 		});
 
 		// Ghost rails (when holding brush)
@@ -203,12 +193,8 @@ public class RenderRails implements IGui {
 			}
 		}
 
-		if (!OptimizedRenderer.renderingShadows()) {
-			MainRenderer.WORKER_THREAD.scheduleMTRRails(occlusionCullingInstance -> {
-				final ObjectArrayList<Runnable> tasks = new ObjectArrayList<>();
-				cullingTasks.forEach(occlusionCullingInstanceRunnableFunction -> tasks.add(occlusionCullingInstanceRunnableFunction.apply(occlusionCullingInstance)));
-				minecraftClient.execute(() -> tasks.forEach(Runnable::run));
-			});
+		if (RenderDiagnostics.isEnabled()) {
+			RenderDiagnostics.noteRails(MinecraftClientData.getInstance().railWrapperList.size(), railsToRender.size());
 		}
 	}
 
@@ -323,14 +309,8 @@ public class RenderRails implements IGui {
 			final BlockPos blockPos = Init.newBlockPos(x1, y1 + LIGHT_REFERENCE_OFFSET, z1);
 			final double distanceToCamera = new Vector3d(x1, 0, z1).distanceTo(new Vector3d(cameraPosition.getXMapped(), 0, cameraPosition.getZMapped())); // Minecraft does not have vertical render distance, no need to compare the Y-axis.
 			if (distanceToCamera <= renderDistance) {
-				if (distanceToCamera < 32) {
-					callback.renderRail(blockPos, x1, z1, x2, z2, x3, z3, x4, z4, y1, y2);
-				} else {
-					final Vector3d rotatedVector = new Vector3d(x1, y1, z1).subtract(cameraPosition).rotateY((float) Math.toRadians(camera.getYaw())).rotateX((float) Math.toRadians(camera.getPitch()));
-					if (rotatedVector.getZMapped() > 0) {
-						callback.renderRail(blockPos, x1, z1, x2, z2, x3, z3, x4, z4, y1, y2);
-					}
-				}
+				// Do not frustum-cull by camera pitch/yaw — that hid rails behind / beside the player.
+				callback.renderRail(blockPos, x1, z1, x2, z2, x3, z3, x4, z4, y1, y2);
 			}
 		}, interval, offsetRadius1, offsetRadius2);
 	}
