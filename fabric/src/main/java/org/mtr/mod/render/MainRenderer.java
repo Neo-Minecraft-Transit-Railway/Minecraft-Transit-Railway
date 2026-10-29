@@ -22,6 +22,7 @@ import org.mtr.mod.generated.lang.TranslationProvider;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -123,8 +124,8 @@ public class MainRenderer extends EntityRenderer<EntityRendering> implements IGu
 		final Vector3d cameraShakeOffset = clientPlayerEntity.getPos().subtract(offset);
 		RenderVehicles.render(millisElapsed, cameraShakeOffset);
 		RenderLifts.render(millisElapsed, cameraShakeOffset);
-		RenderRails.render();
 		RenderLiftLinks.render();
+		RenderRails.render();
 		RenderDiagnostics.noteVehiclesAndLifts(MinecraftClientData.getInstance().vehicles.size(), MinecraftClientData.getInstance().lifts.size());
 		flushQueuedRenders(graphicsHolder, offset);
 		RenderDiagnostics.logFrame(offset, cameraShakeOffset);
@@ -139,6 +140,7 @@ public class MainRenderer extends EntityRenderer<EntityRendering> implements IGu
 			return;
 		}
 		CustomResourceLoader.OPTIMIZED_RENDERER_WRAPPER.render(!Config.getClient().getHideTranslucentParts());
+		RailVanishProbe.onWorldRendered();
 	}
 
 	private static void flushQueuedRenders(GraphicsHolder graphicsHolder, Vector3d offset) {
@@ -150,6 +152,7 @@ public class MainRenderer extends EntityRenderer<EntityRendering> implements IGu
 			}
 		}
 
+		final AtomicInteger queued = new AtomicInteger();
 		for (int i = 0; i < TOTAL_RENDER_STAGES; i++) {
 			for (int j = 0; j < QueuedRenderLayer.values().length; j++) {
 				final QueuedRenderLayer queuedRenderLayer = QueuedRenderLayer.values()[j];
@@ -188,9 +191,11 @@ public class MainRenderer extends EntityRenderer<EntityRendering> implements IGu
 						graphicsHolder.createVertexConsumer(renderLayer);
 					}
 					value.forEach(renderer -> renderer.accept(graphicsHolder, offset));
+					queued.addAndGet(value.size());
 				});
 			}
 		}
+		RenderDiagnostics.noteQueuedDraws(queued.get());
 	}
 
 	public static void scheduleRender(@Nullable Identifier identifier, boolean priority, QueuedRenderLayer queuedRenderLayer, BiConsumer<GraphicsHolder, Vector3d> callback) {

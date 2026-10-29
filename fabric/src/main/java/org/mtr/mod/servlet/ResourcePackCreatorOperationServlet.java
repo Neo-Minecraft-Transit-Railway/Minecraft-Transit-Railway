@@ -141,8 +141,9 @@ public final class ResourcePackCreatorOperationServlet extends AbstractResourceP
 		minecraftClient.execute(() -> {
 			final ClientPlayerEntity clientPlayerEntity = minecraftClient.getPlayerMapped();
 			if (clientPlayerEntity != null) {
+				String s0$ = type.toLowerCase(Locale.ENGLISH);
 				final VehicleSoundBase tempVehicleSoundBase;
-				switch (type.toLowerCase(Locale.ENGLISH)) {
+				switch (s0$) {
 					case "bve":
 						tempVehicleSoundBase = new BveVehicleSound(new BveVehicleSoundConfig(id));
 						break;
@@ -155,7 +156,8 @@ public final class ResourcePackCreatorOperationServlet extends AbstractResourceP
 				}
 
 				if (tempVehicleSoundBase != null) {
-					switch (mode.toLowerCase(Locale.ENGLISH)) {
+					s0$ = mode.toLowerCase(Locale.ENGLISH);
+					switch (s0$) {
 						case "speed":
 							vehicleSoundBase = tempVehicleSoundBase;
 							motorSoundExpiry = System.currentTimeMillis() + 5000;

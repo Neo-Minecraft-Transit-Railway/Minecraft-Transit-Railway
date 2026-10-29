@@ -44,7 +44,11 @@ public abstract class SavedRailScreenBase<T extends SavedRailBase<T, U>, U exten
 		}
 		textWidth = Math.max(GraphicsHolder.getTextWidth(savedRailNumberText), additionalTextWidths) + TEXT_PADDING;
 
-		sliderDwellTimeMin = new WidgetShorterSlider(0, 0, (int) Math.floor(MAX_DWELL_TIME / 2F / SECONDS_PER_MINUTE), TranslationProvider.GUI_MTR_ARRIVAL_MIN::getString, null);
+		final int dwellTimeMinSteps = (int) Math.floor(MAX_DWELL_TIME / 2F / SECONDS_PER_MINUTE);
+		final TranslationProvider.TranslationHolder arrivalMinHolder = TranslationProvider.GUI_MTR_ARRIVAL_MIN;
+		java.util.Objects.requireNonNull(TranslationProvider.GUI_MTR_ARRIVAL_MIN);
+		final TranslationProvider.TranslationHolder arrivalMin = arrivalMinHolder;
+		sliderDwellTimeMin = new WidgetShorterSlider(0, 0, dwellTimeMinSteps, value -> arrivalMin.getString(value), null);
 		sliderDwellTimeSec = new WidgetShorterSlider(0, 0, SECONDS_PER_MINUTE * 2 - 1, 10, 2, value -> TranslationProvider.GUI_MTR_ARRIVAL_SEC.getString(value / 2F), null);
 	}
 

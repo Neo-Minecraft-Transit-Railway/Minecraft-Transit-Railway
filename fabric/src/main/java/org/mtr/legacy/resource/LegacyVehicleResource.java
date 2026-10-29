@@ -286,29 +286,14 @@ public final class LegacyVehicleResource extends VehicleResourceSchema {
 				partsObject.addProperty("doorAnimationType", door_animation_type);
 
 				if (renderConditionOverride == null) {
-					final String renderCondition;
-					switch (tryGet(propertiesPartsObject, "render_condition").toUpperCase(Locale.ENGLISH)) {
-						case "DOORS_OPEN":
-						case "DOORS_LEFT_OPEN":
-						case "DOORS_RIGHT_OPEN":
-							renderCondition = "DOORS_OPENED";
-							break;
-						case "DOORS_CLOSED":
-						case "DOORS_LEFT_CLOSED":
-						case "DOORS_RIGHT_CLOSED":
-							renderCondition = "DOORS_CLOSED";
-							break;
-						case "MOVING_FORWARDS":
-							renderCondition = "ON_ROUTE_FORWARDS";
-							break;
-						case "MOVING_BACKWARDS":
-							renderCondition = "ON_ROUTE_BACKWARDS";
-							break;
-						default:
-							renderCondition = "NORMAL";
-							break;
-					}
-					partsObject.addProperty("condition", renderCondition);
+					String s0$ = tryGet(propertiesPartsObject, "render_condition").toUpperCase(Locale.ENGLISH);
+					partsObject.addProperty("condition", switch (s0$) {
+						case "DOORS_OPEN", "DOORS_LEFT_OPEN", "DOORS_RIGHT_OPEN" -> "DOORS_OPENED";
+						case "DOORS_CLOSED", "DOORS_LEFT_CLOSED", "DOORS_RIGHT_CLOSED" -> "DOORS_CLOSED";
+						case "MOVING_FORWARDS" -> "ON_ROUTE_FORWARDS";
+						case "MOVING_BACKWARDS" -> "ON_ROUTE_BACKWARDS";
+						default -> "NORMAL";
+					});
 				} else {
 					partsObject.addProperty("condition", renderConditionOverride);
 				}
@@ -346,7 +331,8 @@ public final class LegacyVehicleResource extends VehicleResourceSchema {
 				final double doorXMultiplier;
 				final double doorZMultiplier;
 				if (propertiesPartsObject.has("door_offset")) {
-					switch (tryGet(propertiesPartsObject, "door_offset").toUpperCase(Locale.ENGLISH)) {
+					String s0$ = tryGet(propertiesPartsObject, "door_offset").toUpperCase(Locale.ENGLISH);
+					switch (s0$) {
 						case "LEFT_NEGATIVE":
 							doorXMultiplier = mirror ? -1 : 1;
 							doorZMultiplier = -doorMax;
@@ -369,18 +355,13 @@ public final class LegacyVehicleResource extends VehicleResourceSchema {
 							break;
 					}
 				} else {
-					switch (tryGet(propertiesPartsObject, "door_offset_x").toUpperCase(Locale.ENGLISH)) {
-						case "LEFT":
-						case "LEFT_NEGATIVE":
-						case "RIGHT":
-						case "RIGHT_NEGATIVE":
-							doorXMultiplier = -1;
-							break;
-						default:
-							doorXMultiplier = 0;
-							break;
-					}
-					switch (tryGet(propertiesPartsObject, "door_offset_z").toUpperCase(Locale.ENGLISH)) {
+					String s0$ = tryGet(propertiesPartsObject, "door_offset_x").toUpperCase(Locale.ENGLISH);
+					doorXMultiplier = switch (s0$) {
+						case "LEFT", "LEFT_NEGATIVE", "RIGHT", "RIGHT_NEGATIVE" -> -1.0;
+						default -> 0.0;
+					};
+					s0$ = tryGet(propertiesPartsObject, "door_offset_z").toUpperCase(Locale.ENGLISH);
+					switch (s0$) {
 						case "LEFT_NEGATIVE":
 						case "RIGHT_NEGATIVE":
 							doorZMultiplier = -doorMax;

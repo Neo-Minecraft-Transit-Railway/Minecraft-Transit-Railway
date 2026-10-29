@@ -66,20 +66,18 @@ public class RenderLifts implements IGui {
 					if (previousLiftFloor[0] != null) {
 						final Position position1 = liftFloor.getPosition();
 						final Position position2 = previousLiftFloor[0].getPosition();
-						MainRenderer.scheduleRender(QueuedRenderLayer.LINES, (graphicsHolder, offset) -> {
-							final ObjectArrayList<Vector> trackPositions = ItemLiftRefresher.findPath(new World(clientWorld.data), position1, position2);
-							for (int i = 1; i < trackPositions.size(); i++) {
-								graphicsHolder.drawLineInWorld(
-										(float) (trackPositions.get(i - 1).x - offset.getXMapped() + 0.5),
-										(float) (trackPositions.get(i - 1).y - offset.getYMapped() + 0.5),
-										(float) (trackPositions.get(i - 1).z - offset.getZMapped() + 0.5),
-										(float) (trackPositions.get(i).x - offset.getXMapped() + 0.5),
-										(float) (trackPositions.get(i).y - offset.getYMapped() + 0.5),
-										(float) (trackPositions.get(i).z - offset.getZMapped() + 0.5),
-										ARGB_WHITE
-								);
-							}
-						});
+						final ObjectArrayList<Vector> trackPositions = ItemLiftRefresher.findPath(new World(clientWorld.data), position1, position2);
+						for (int i = 1; i < trackPositions.size(); i++) {
+							RenderLiftLinks.scheduleSegmentedLine(
+									trackPositions.get(i - 1).x + 0.5,
+									trackPositions.get(i - 1).y + 0.5,
+									trackPositions.get(i - 1).z + 0.5,
+									trackPositions.get(i).x + 0.5,
+									trackPositions.get(i).y + 0.5,
+									trackPositions.get(i).z + 0.5,
+									ARGB_WHITE
+							);
+						}
 					}
 
 					previousLiftFloor[0] = liftFloor;

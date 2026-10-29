@@ -57,7 +57,7 @@ public class RenderVehicleHelper {
 					} else if (block.data instanceof BlockPSDAPGDoorBase && blockState.get(new Property<>(BlockPSDAPGDoorBase.UNLOCKED.data))) {
 						if (carHeight > 0) {
 							final int doorY = checkPos.getY();
-							if (doorY >= carMaxY || doorY + 1 <= carMinY) {
+							if (doorY >= carMaxY + 1 || doorY + 1 <= carMinY - 1) {
 								continue;
 							}
 						}
@@ -108,12 +108,11 @@ public class RenderVehicleHelper {
 					playerPosition.getYMapped(),
 					playerPosition.getZMapped() + HALF_PLAYER_WIDTH
 			) ? 0xFF00FF00 : color;
-			final Vector3d zeroVector = Vector3d.getZeroMapped();
 			MainRenderer.scheduleRender(QueuedRenderLayer.LINES, (graphicsHolder, offset) -> {
-				drawLine(graphicsHolder, corner1, corner2, useOffset ? offset : zeroVector, newColor);
-				drawLine(graphicsHolder, corner2, corner3, useOffset ? offset : zeroVector, newColor);
-				drawLine(graphicsHolder, corner3, corner4, useOffset ? offset : zeroVector, newColor);
-				drawLine(graphicsHolder, corner4, corner1, useOffset ? offset : zeroVector, newColor);
+				drawLine(graphicsHolder, corner1, corner2, offset, newColor);
+				drawLine(graphicsHolder, corner2, corner3, offset, newColor);
+				drawLine(graphicsHolder, corner3, corner4, offset, newColor);
+				drawLine(graphicsHolder, corner4, corner1, offset, newColor);
 			});
 		}
 	}

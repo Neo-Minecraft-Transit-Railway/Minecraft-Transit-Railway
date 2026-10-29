@@ -434,6 +434,11 @@ public final class InitClient {
 			BlockTrainAnnouncer.processQueue();
 			ResourcePackCreatorOperationServlet.tick(millisElapsed);
 
+			if (KeyBindings.RENDER_DIAGNOSTICS.consumeClick()) {
+				RenderDiagnostics.toggle();
+			}
+			RailVanishProbe.tickApplyCamera();
+
 			// If player is moving, send a request every 0.5 seconds to the server to fetch any new nearby data
 			final ClientPlayerEntity clientPlayerEntity = MinecraftClient.getInstance().getPlayerMapped();
 			if (clientPlayerEntity != null && lastUpdatePacketMillis > 0 && getGameMillis() > lastUpdatePacketMillis) {
@@ -445,9 +450,6 @@ public final class InitClient {
 		});
 
 		REGISTRY_CLIENT.eventRegistryClient.registerEndClientTick(() -> {
-			if (KeyBindings.RENDER_DIAGNOSTICS.consumeClick()) {
-				RenderDiagnostics.toggle();
-			}
 			if (movePlayer != null) {
 				movePlayer.run();
 				movePlayer = null;

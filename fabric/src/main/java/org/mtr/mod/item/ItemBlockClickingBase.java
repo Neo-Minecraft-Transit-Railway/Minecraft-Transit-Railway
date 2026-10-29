@@ -2,6 +2,7 @@ package org.mtr.mod.item;
 
 import org.mtr.mapping.holder.*;
 import org.mtr.mapping.mapper.ItemExtension;
+import org.mtr.mapping.mapper.ItemStackNbtHelper;
 import org.mtr.mod.generated.lang.TranslationProvider;
 
 import javax.annotation.Nonnull;
@@ -19,31 +20,39 @@ public abstract class ItemBlockClickingBase extends ItemExtension {
 	@Nonnull
 	@Override
 	public ActionResult useOnBlock2(ItemUsageContext context) {
-		if (clickCondition(context)) {
-			final ItemStack stack = context.getStack();
-			final CompoundTag compoundTag = stack.getOrCreateTag();
-
-			if (compoundTag.contains(TAG_POS)) {
+		final ItemStack stack = context.getStack();
+		final CompoundTag compoundTag = ItemStackNbtHelper.getOrCreateTag(stack);
+		final boolean hasSelection = compoundTag.contains(TAG_POS);
+		if (hasSelection) {
+			final BlockPos posEnd = BlockPos.fromLong(compoundTag.getLong(TAG_POS));
+			if (clickCondition(context)) {
 				if (!context.getWorld().isClient()) {
-					final BlockPos posEnd = BlockPos.fromLong(compoundTag.getLong(TAG_POS));
 					onEndClick(context, posEnd, compoundTag);
 				}
 				compoundTag.remove(TAG_POS);
+				ItemStackNbtHelper.saveTag(stack, compoundTag);
+				return ActionResult.SUCCESS;
 			} else {
-				if (!context.getWorld().isClient()) {
-					onStartClick(context, compoundTag);
-				}
-				compoundTag.putLong(TAG_POS, context.getBlockPos().asLong());
+				compoundTag.remove(TAG_POS);
+				compoundTag.remove("transport_mode");
+				ItemStackNbtHelper.saveTag(stack, compoundTag);
+				return ActionResult.FAIL;
 			}
-			org.mtr.mapping.mapper.ItemStackNbtHelper.saveTag(stack, compoundTag);
+		} else if (clickCondition(context)) {
+			if (!context.getWorld().isClient()) {
+				onStartClick(context, compoundTag);
+			}
+			compoundTag.putLong(TAG_POS, context.getBlockPos().asLong());
+			ItemStackNbtHelper.saveTag(stack, compoundTag);
 			return ActionResult.SUCCESS;
+		} else {
+			return context.getWorld().isClient() ? super.useOnBlock2(context) : ActionResult.FAIL;
 		}
-		return context.getWorld().isClient() ? super.useOnBlock2(context) : ActionResult.FAIL;
 	}
 
 	@Override
 	public void addTooltips(ItemStack stack, @Nullable World world, List<MutableText> tooltip, TooltipContext options) {
-		final CompoundTag compoundTag = org.mtr.mapping.mapper.ItemStackNbtHelper.getTag(stack);
+		final CompoundTag compoundTag = ItemStackNbtHelper.getTag(stack);
 		final long posLong = compoundTag.getLong(TAG_POS);
 		if (posLong != 0) {
 			tooltip.add(TranslationProvider.TOOLTIP_MTR_SELECTED_BLOCK.getMutableText(BlockPos.fromLong(posLong).toShortString()).formatted(TextFormatting.GOLD));

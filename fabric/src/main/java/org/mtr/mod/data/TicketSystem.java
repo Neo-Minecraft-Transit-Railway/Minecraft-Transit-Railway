@@ -15,6 +15,7 @@ import org.mtr.mod.generated.lang.TranslationProvider;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Iterator;
 import java.util.function.Consumer;
 
 public class TicketSystem {
@@ -44,7 +45,9 @@ public class TicketSystem {
 				// Prefer the station whose area actually contains the barrier; else nearest by center.
 				final Position barrierPos = Init.blockPosToPosition(blockPos);
 				Station station = null;
-				for (final Station candidate : stations) {
+				Iterator i$ = stations.iterator();
+				while (i$.hasNext()) {
+					final Station candidate = (Station) i$.next();
 					if (candidate.inArea(barrierPos)) {
 						station = candidate;
 						break;
@@ -53,7 +56,9 @@ public class TicketSystem {
 				if (station == null) {
 					station = stations.get(0);
 					double best = Double.MAX_VALUE;
-					for (final Station candidate : stations) {
+					Iterator i$x = stations.iterator();
+					while (i$x.hasNext()) {
+						final Station candidate = (Station) i$x.next();
 						final double dx = (candidate.getMinX() + candidate.getMaxX()) / 2.0 - barrierPos.getX();
 						final double dz = (candidate.getMinZ() + candidate.getMaxZ()) / 2.0 - barrierPos.getZ();
 						final double dist = dx * dx + dz * dz;

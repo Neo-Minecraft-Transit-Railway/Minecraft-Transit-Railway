@@ -38,47 +38,39 @@ public class BlockLiftButtons extends BlockWaterloggable implements DirectionHel
 			player.sendMessage((unlocked ? TranslationProvider.GUI_MTR_LIFT_BUTTONS_UNLOCKED : TranslationProvider.GUI_MTR_LIFT_BUTTONS_LOCKED).getText(), true);
 		});
 
-		if (result == ActionResult.SUCCESS) {
+		if (result.consumesAction()) {
 			return ActionResult.SUCCESS;
-		} else {
-			if (player.isHolding(Items.LIFT_BUTTONS_LINK_CONNECTOR.get()) || player.isHolding(Items.LIFT_BUTTONS_LINK_REMOVER.get())) {
-				return ActionResult.PASS;
+		} else if (!player.isHolding(Items.LIFT_BUTTONS_LINK_CONNECTOR.get()) && !player.isHolding(Items.LIFT_BUTTONS_LINK_REMOVER.get())) {
+			final boolean unlocked = IBlock.getStatePropertySafe(state, UNLOCKED);
+			final double hitY = MathHelper.fractionalPart(hit.getPos().getYMapped());
+			if (!unlocked || !(hitY < 0.5)) {
+				return ActionResult.FAIL;
+			} else if (!world.isClient()) {
+				return ActionResult.SUCCESS;
 			} else {
-				final boolean unlocked = IBlock.getStatePropertySafe(state, UNLOCKED);
-				final double hitY = MathHelper.fractionalPart(hit.getPos().getYMapped());
+				final org.mtr.mapping.holder.BlockEntity blockEntity = world.getBlockEntity(pos);
+				if (blockEntity != null && blockEntity.data instanceof BlockEntity) {
+					final boolean[] buttonStates = {false, false};
+					((BlockEntity) blockEntity.data).trackPositions.forEach(trackPosition -> BlockLiftButtons.hasButtonsClient(trackPosition, buttonStates, (floor, lift) -> {
+					}));
 
-				if (unlocked && hitY < 0.5) {
-					// Special case: clientside button press
-					if (world.isClient()) {
-						final org.mtr.mapping.holder.BlockEntity blockEntity = world.getBlockEntity(pos);
-						if (blockEntity != null && blockEntity.data instanceof BlockEntity) {
-							// Array order: has down button, has up button
-							final boolean[] buttonStates = {false, false};
-							((BlockEntity) blockEntity.data).trackPositions.forEach(trackPosition -> BlockLiftButtons.hasButtonsClient(trackPosition, buttonStates, (floor, lift) -> {
-							}));
-
-							final LiftDirection liftDirection;
-							if (buttonStates[0] && buttonStates[1]) {
-								liftDirection = hitY < 0.25 ? LiftDirection.DOWN : LiftDirection.UP;
-							} else {
-								liftDirection = buttonStates[0] ? LiftDirection.DOWN : LiftDirection.UP;
-							}
-
-							final PressLift pressLift = new PressLift();
-							((BlockEntity) blockEntity.data).trackPositions.forEach(trackPosition -> pressLift.add(Init.blockPosToPosition(trackPosition), liftDirection));
-							InitClient.REGISTRY_CLIENT.sendPacketToServer(new PacketPressLiftButton(pressLift));
-
-							return ActionResult.SUCCESS;
-						} else {
-							return ActionResult.FAIL;
-						}
+					final LiftDirection liftDirection;
+					if (buttonStates[0] && buttonStates[1]) {
+						liftDirection = hitY < 0.25 ? LiftDirection.DOWN : LiftDirection.UP;
+					} else {
+						liftDirection = buttonStates[0] ? LiftDirection.DOWN : LiftDirection.UP;
 					}
 
+					final PressLift pressLift = new PressLift();
+					((BlockEntity) blockEntity.data).trackPositions.forEach(trackPosition -> pressLift.add(Init.blockPosToPosition(trackPosition), liftDirection));
+					InitClient.REGISTRY_CLIENT.sendPacketToServer(new PacketPressLiftButton(pressLift));
 					return ActionResult.SUCCESS;
 				} else {
 					return ActionResult.FAIL;
 				}
 			}
+		} else {
+			return ActionResult.FAIL;
 		}
 	}
 

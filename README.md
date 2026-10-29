@@ -25,6 +25,12 @@ Please report any issues or bugs you find; that would be greatly appreciated! Re
 
 This fork publishes Fabric jars for **Minecraft 1.21.11 + MTR 4.0.5**. See GitHub Releases.
 
+### patch4 (`v4.0.5-1.21.11-patch4`)
+
+- Source-aligned rebuild of the working Sep-27 runtime behavior (lifts/PSD/rail diagnostics, iterators, ticket system, etc.).
+- Pure Gradle remapJar artifacts (no bak class overlay).
+- Includes `RailVanishProbe` diagnostics retained from the 1.21.11 port work.
+
 ### patch2 (`v4.0.5-1.21.11-patch2`)
 
 - **Rails vanishing / flickering**: disable incorrect occlusion + camera-frustum culling that hid rails; capture live view/projection matrices for optimized rail shaders (beyond the patch1 FOV fix).

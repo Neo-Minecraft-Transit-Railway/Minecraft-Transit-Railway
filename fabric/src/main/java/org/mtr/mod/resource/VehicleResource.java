@@ -417,7 +417,9 @@ public final class VehicleResource extends VehicleResourceSchema {
 			modelsToInitialize.addAll(bogie2Models);
 
 			return new CachedResource<>(() -> {
-				for (final VehicleModel vehicleModel : modelsToInitialize) {
+				final java.util.Iterator i$ = modelsToInitialize.iterator();
+				while (i$.hasNext()) {
+					final VehicleModel vehicleModel = (VehicleModel) i$.next();
 					final DynamicVehicleModel dynamicVehicleModel = vehicleModel.cachedModel.getData(force);
 					if (dynamicVehicleModel == null) {
 						return null;

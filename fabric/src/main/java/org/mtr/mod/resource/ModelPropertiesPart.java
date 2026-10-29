@@ -326,7 +326,9 @@ public final class ModelPropertiesPart extends ModelPropertiesPartSchema impleme
 			} else {
 				double doorOverrideValue = 0;
 				boolean canOpen = false;
-				for (final ObjectDoubleImmutablePair<Box> openDoorway : openDoorways) {
+				final java.util.Iterator i$ = openDoorways.iterator();
+				while (i$.hasNext()) {
+					final ObjectDoubleImmutablePair<Box> openDoorway = (ObjectDoubleImmutablePair<Box>) i$.next();
 					if (openDoorway.left().equals(partDetails.doorway)) {
 						doorOverrideValue = openDoorway.rightDouble();
 						canOpen = true;

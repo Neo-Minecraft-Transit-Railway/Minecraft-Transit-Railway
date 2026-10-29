@@ -13,7 +13,9 @@ public final class BlockbenchModel extends BlockbenchModelSchema {
 		// Combine groups and outliner for the Blockbench 5.0 update
 		outliner.forEach(blockbenchOutline -> {
 			boolean needsMigration = true;
-			for (final BlockbenchOutline group : groups) {
+			final java.util.Iterator i$ = groups.iterator();
+			while (i$.hasNext()) {
+				final BlockbenchOutline group = (BlockbenchOutline) i$.next();
 				if (blockbenchOutline.uuidEquals(group)) {
 					group.childrenUuid.addAll(blockbenchOutline.childrenUuid);
 					group.getChildren().addAll(blockbenchOutline.getChildren());

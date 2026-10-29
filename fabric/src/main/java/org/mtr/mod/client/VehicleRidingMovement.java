@@ -387,7 +387,7 @@ public class VehicleRidingMovement {
 					clientPlayerEntity.setFallDistanceMapped(0);
 					clientPlayerEntity.setVelocity(0, 0, 0);
 					clientPlayerEntity.setMovementSpeed(0);
-					clientPlayerEntity.updatePosition(x, y, z);
+					clientPlayerEntity.snapTo(x, y, z);
 				}
 			};
 

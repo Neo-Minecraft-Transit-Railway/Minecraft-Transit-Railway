@@ -104,13 +104,19 @@ public interface IBlock {
 	}
 
 	static void onBreakCreative(World world, @Nullable PlayerEntity player, BlockPos pos) {
-		if (!world.isClient() && (player == null || player.isCreative())) {
-			world.setBlockState(pos, Blocks.getAirMapped().getDefaultState(), 35);
+		if (!world.isClient()) {
 			final BlockState state = world.getBlockState(pos);
-			if (player != null) {
-				world.syncWorldEvent(player, 2001, pos, Block.getRawIdFromState(state));
+			if (!state.isAir()) {
+				if (player != null) {
+					world.syncWorldEvent(player, 2001, pos, Block.getRawIdFromState(state));
+				}
+				world.setBlockState(pos, Blocks.getAirMapped().getDefaultState(), 35);
 			}
 		}
+	}
+
+	static boolean isHoldingLiftLinker(PlayerEntity player) {
+		return isHoldingItem(player, Items.LIFT_BUTTONS_LINK_CONNECTOR.get()) || isHoldingItem(player, Items.LIFT_BUTTONS_LINK_REMOVER.get());
 	}
 
 	static Direction getSideDirection(BlockState state) {

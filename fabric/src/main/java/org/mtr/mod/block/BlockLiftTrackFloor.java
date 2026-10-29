@@ -23,16 +23,17 @@ public class BlockLiftTrackFloor extends BlockLiftTrackBase implements BlockWith
 	@Nonnull
 	@Override
 	public ActionResult onUse2(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-		if (player.isHolding(org.mtr.mod.Items.LIFT_BUTTONS_LINK_CONNECTOR.get()) || player.isHolding(org.mtr.mod.Items.LIFT_BUTTONS_LINK_REMOVER.get()) || player.isHolding(org.mtr.mod.Items.LIFT_REFRESHER.get())) {
-			return ActionResult.PASS;
-		}
-		return IBlock.checkHoldingBrush(world, player, () -> {
-			final org.mtr.mapping.holder.BlockEntity entity = world.getBlockEntity(pos);
-			if (entity != null && entity.data instanceof BlockEntity) {
-				((BlockEntity) entity.data).markDirty2();
-				PacketOpenBlockEntityScreen.sendOrOpen(world, player, pos);
-			}
-		});
+		return !player.isHolding(org.mtr.mod.Items.LIFT_BUTTONS_LINK_CONNECTOR.get())
+				&& !player.isHolding(org.mtr.mod.Items.LIFT_BUTTONS_LINK_REMOVER.get())
+				&& !player.isHolding(org.mtr.mod.Items.LIFT_REFRESHER.get())
+				? IBlock.checkHoldingBrush(world, player, () -> {
+					final org.mtr.mapping.holder.BlockEntity entity = world.getBlockEntity(pos);
+					if (entity != null && entity.data instanceof BlockEntity) {
+						((BlockEntity) entity.data).markDirty2();
+						PacketOpenBlockEntityScreen.sendOrOpen(world, player, pos);
+					}
+				})
+				: ActionResult.FAIL;
 	}
 
 	@Nonnull

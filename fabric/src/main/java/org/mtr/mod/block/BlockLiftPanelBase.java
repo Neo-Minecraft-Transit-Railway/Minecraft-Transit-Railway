@@ -84,10 +84,12 @@ public abstract class BlockLiftPanelBase extends BlockExtension implements IBloc
 	@Nonnull
 	@Override
 	public ActionResult onUse2(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-		if (player.isHolding(Items.LIFT_BUTTONS_LINK_CONNECTOR.get()) || player.isHolding(Items.LIFT_BUTTONS_LINK_REMOVER.get())) {
-			return ActionResult.PASS;
+		if (world.isClient()) {
+			return ActionResult.SUCCESS;
 		}
-		return world.isClient() ? ActionResult.SUCCESS : ActionResult.FAIL;
+		return !player.isHolding(Items.LIFT_BUTTONS_LINK_CONNECTOR.get()) && !player.isHolding(Items.LIFT_BUTTONS_LINK_REMOVER.get())
+				? ActionResult.FAIL
+				: ActionResult.PASS;
 	}
 
 	@Override

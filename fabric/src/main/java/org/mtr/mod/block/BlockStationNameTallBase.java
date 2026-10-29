@@ -28,7 +28,7 @@ public abstract class BlockStationNameTallBase extends BlockStationNameBase impl
 			final boolean newMetalProperty = isWhite == IBlock.getStatePropertySafe(state, METAL);
 
 			updateProperties(world, pos, newMetalProperty, newColorProperty);
-			switch (IBlock.getStatePropertySafe(state, THIRD)) {
+			switch ((EnumThird) IBlock.getStatePropertySafe(state, THIRD)) {
 				case LOWER:
 					updateProperties(world, pos.up(), newMetalProperty, newColorProperty);
 					updateProperties(world, pos.up(2), newMetalProperty, newColorProperty);

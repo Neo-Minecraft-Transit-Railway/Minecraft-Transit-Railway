@@ -61,14 +61,9 @@ public class RenderLiftPanel<T extends BlockLiftPanelBase.BlockEntityBase> exten
 
 		final StoredMatrixTransformations storedMatrixTransformations1 = new StoredMatrixTransformations(blockPos.getX() + 0.5, blockPos.getY(), blockPos.getZ() + 0.5);
 
-		// Render track link if holding linker item
-		final Direction trackFacing = IBlock.getStatePropertySafe(world, trackPosition, FACING);
-		RenderLiftButtons.renderLiftObjectLink(
-				storedMatrixTransformations1, world,
-				new Vector3d(facing.getOffsetX() / 2F + facing.rotateYClockwise().getOffsetX() * (isOdd ? 1 : 0.5), 0.5, facing.getOffsetZ() / 2F + facing.rotateYClockwise().getOffsetZ() * (isOdd ? 1 : 0.5)),
-				new Vector3d(trackPosition.getX() - blockPos.getX() + trackFacing.getOffsetX() / 2F, trackPosition.getY() - blockPos.getY() + 0.5, trackPosition.getZ() - blockPos.getZ() + trackFacing.getOffsetZ() / 2F),
-				holdingLinker
-		);
+		// Link lines are drawn globally by RenderLiftLinks (bak runtime).
+		if (holdingLinker) {
+		}
 
 		Lift lift = null;
 		for (final Lift checkLift : MinecraftClientData.getInstance().lifts) {

@@ -8,11 +8,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(PerspectiveProjectionMatrixBuffer.class)
+@Mixin({PerspectiveProjectionMatrixBuffer.class})
 public abstract class PerspectiveProjectionMatrixBufferMixin {
-
-	@Inject(method = "getBuffer", at = @At("HEAD"))
-	private void mtr$captureProjection(Matrix4f matrix, CallbackInfoReturnable<?> cir) {
-		CapturedProjection.capture(matrix);
-	}
+   @Inject(
+      method = {"getBuffer"},
+      at = {@At("HEAD")}
+   )
+   private void mtr$captureProjection(Matrix4f matrix, CallbackInfoReturnable<?> cir) {
+      CapturedProjection.capture(matrix);
+   }
 }

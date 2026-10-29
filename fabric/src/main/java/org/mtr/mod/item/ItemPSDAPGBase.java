@@ -4,6 +4,7 @@ import org.mtr.mapping.holder.*;
 import org.mtr.mapping.mapper.ItemExtension;
 import org.mtr.mod.Blocks;
 import org.mtr.mod.block.BlockPSDAPGBase;
+import org.mtr.mod.block.BlockPSDAPGDoorBase;
 import org.mtr.mod.block.BlockPSDTop;
 import org.mtr.mod.block.IBlock;
 import org.mtr.mod.block.TripleHorizontalBlock;
@@ -11,6 +12,7 @@ import org.mtr.mod.generated.lang.TranslationProvider;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ItemPSDAPGBase extends ItemExtension implements IBlock {
@@ -33,31 +35,51 @@ public class ItemPSDAPGBase extends ItemExtension implements IBlock {
 		}
 
 		final World world = context.getWorld();
-		final Direction playerFacing = context.getPlayerFacing();
-		final BlockPos pos = context.getBlockPos().offset(context.getSide());
+		if (!world.isClient()) {
+			final Direction playerFacing = context.getPlayerFacing();
+			final BlockPos pos = context.getBlockPos().offset(context.getSide());
+			final int placeFlags = 18;
+			final ArrayList<BlockPos> placed = new ArrayList<>();
 
-		for (int x = 0; x < horizontalBlocks; x++) {
-			final BlockPos newPos = pos.offset(playerFacing.rotateYClockwise(), x);
+			for (int x = 0; x < horizontalBlocks; x++) {
+				final BlockPos newPos = pos.offset(playerFacing.rotateYClockwise(), x);
 
-			for (int y = 0; y < 2; y++) {
-				final BlockState state = getBlockStateFromItem().with(new Property<>(BlockPSDAPGBase.FACING.data), playerFacing.data).with(new Property<>(HALF.data), y == 1 ? DoubleBlockHalf.UPPER : DoubleBlockHalf.LOWER);
-				if (item.isDoor) {
-					BlockState neighborState = state.with(new Property<>(SIDE.data), x == 0 ? EnumSide.LEFT : EnumSide.RIGHT);
-					if (type.isOdd) {
-						neighborState = neighborState.with(new Property<>(TripleHorizontalBlock.CENTER.data), x > 0 && x < horizontalBlocks - 1);
+				for (int y = 0; y < 2; y++) {
+					BlockState state = getBlockStateFromItem()
+							.with(new Property<>(BlockPSDAPGBase.FACING.data), playerFacing.data)
+							.with(new Property<>(HALF.data), y == 1 ? DoubleBlockHalf.UPPER : DoubleBlockHalf.LOWER);
+					if (type == EnumPSDAPGType.LIFT_DOOR_1 || type == EnumPSDAPGType.LIFT_DOOR_ODD_1) {
+						state = state.with(new Property<>(BlockPSDAPGDoorBase.UNLOCKED.data), true);
 					}
-					world.setBlockState(newPos.up(y), neighborState);
-				} else {
-					world.setBlockState(newPos.up(y), state.with(new Property<>(SIDE_EXTENDED.data), EnumSide.SINGLE));
+
+					final BlockPos placePos = newPos.up(y);
+					if (item.isDoor) {
+						BlockState neighborState = state.with(new Property<>(SIDE.data), x == 0 ? EnumSide.LEFT : EnumSide.RIGHT);
+						if (type.isOdd) {
+							neighborState = neighborState.with(new Property<>(TripleHorizontalBlock.CENTER.data), x > 0 && x < horizontalBlocks - 1);
+						}
+						world.setBlockState(placePos, neighborState, placeFlags);
+					} else {
+						world.setBlockState(placePos, state.with(new Property<>(SIDE_EXTENDED.data), EnumSide.SINGLE), placeFlags);
+					}
+					placed.add(placePos);
+				}
+
+				if (type.isPSD) {
+					final BlockPos topPos = newPos.up(2);
+					world.setBlockState(topPos, BlockPSDTop.getActualState(WorldAccess.cast(world), topPos), placeFlags);
+					placed.add(topPos);
 				}
 			}
 
-			if (type.isPSD) {
-				world.setBlockState(newPos.up(2), BlockPSDTop.getActualState(WorldAccess.cast(world), newPos.up(2)));
+			for (final BlockPos placedPos : placed) {
+				final BlockState placedState = world.getBlockState(placedPos);
+				world.updateNeighbors(placedPos, placedState.getBlock());
 			}
+
+			context.getStack().decrement(1);
 		}
 
-		context.getStack().decrement(1);
 		return ActionResult.SUCCESS;
 	}
 
@@ -121,7 +143,8 @@ public class ItemPSDAPGBase extends ItemExtension implements IBlock {
 			}
 
 			for (int y = 0; y < height; y++) {
-				if (!world.getBlockState(offsetPos.up(y)).getBlock().equals(org.mtr.mapping.holder.Blocks.getAirMapped())) {
+				final BlockState existing = world.getBlockState(offsetPos.up(y));
+				if (!existing.isAir() && !existing.getBlock().equals(org.mtr.mapping.holder.Blocks.getAirMapped())) {
 					return true;
 				}
 			}

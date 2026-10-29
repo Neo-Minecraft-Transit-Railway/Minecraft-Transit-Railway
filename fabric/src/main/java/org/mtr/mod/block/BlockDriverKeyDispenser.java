@@ -157,7 +157,9 @@ public class BlockDriverKeyDispenser extends BlockWaterloggable implements Direc
 			final World world = getWorld2();
 			if (world != null && !world.isClient()) {
 				Init.sendMessageC2S(OperationProcessor.NEARBY_DEPOTS, world.getServer(), world, new NearbyAreasRequest<>(Init.blockPosToPosition(getPos2()), 0), nearbyAreasResponse -> {
-					for (final Depot depot : nearbyAreasResponse.getDepots()) {
+					final java.util.Iterator i$ = nearbyAreasResponse.getDepots().iterator();
+					if (i$.hasNext()) {
+						final Depot depot = (Depot) i$.next();
 						if (dispenseBasicDriverKey) {
 							spawnItemStack(world, depot, Items.BASIC_DRIVER_KEY.get().getDefaultStack(), direction);
 						}
@@ -169,8 +171,6 @@ public class BlockDriverKeyDispenser extends BlockWaterloggable implements Direc
 						if (dispenseGuardKey) {
 							spawnItemStack(world, depot, Items.GUARD_KEY.get().getDefaultStack(), direction);
 						}
-
-						break;
 					}
 				}, NearbyAreasResponse.class);
 			}

@@ -274,6 +274,10 @@ public class BuildTools {
 		final StringBuilder stringBuilder = new StringBuilder("package org.mtr.mod.generated.lang;import org.mtr.mapping.holder.MutableText;import org.mtr.mapping.holder.Text;import org.mtr.mapping.mapper.GraphicsHolder;import org.mtr.mapping.mapper.TextHelper;public interface TranslationProvider{\n");
 		JsonParser.parseString(FileUtils.readFileToString(path.resolve("src/main/resources/assets/mtr/lang/en_us.json").toFile(), StandardCharsets.UTF_8)).getAsJsonObject().entrySet().forEach(entry -> {
 			final String key = entry.getKey();
+			// bak runtime jar has this lang key but TranslationProvider was generated without the field
+			if ("key.mtr.render_diagnostics".equals(key)) {
+				return;
+			}
 			if (key.startsWith("block.") || key.startsWith("item.") || key.startsWith("entity.") || key.startsWith("itemGroup.")) {
 				stringBuilder.append("@SuppressWarnings(\"unused\")");
 			}
